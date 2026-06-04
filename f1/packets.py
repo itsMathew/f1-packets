@@ -326,7 +326,7 @@ class Retirement(Packet):
 
 class DrsDisabled(Packet):
     _fields_ = [
-        ("reason", ctypes.c_NEuint8),
+        ("reason", ctypes.c_uint8),
     ]
 
 
@@ -441,13 +441,6 @@ class EventDataDetails(ctypes.Union, PacketMixin):
 
 class PacketEventData(Packet):
     _fields_ = [
-        ("cs_fastest_lap_event_code", ctypes.c_NEchar*),
-        ("cs_drs_disabled_event_code", ctypes.c_NEchar*),
-        ("cs_race_winner_event_code", ctypes.c_NEchar*),
-        ("cs_start_lights_event_code", ctypes.c_NEchar*),
-        ("cs_stop_go_served_event_code", ctypes.c_NEchar*),
-        ("cs_red_flag_event_code", ctypes.c_NEchar*),
-        ("cs_collision_event_code", ctypes.c_NEchar*),
         ("header", PacketHeader),
         ("event_string_code", ctypes.c_uint8 * 4),
         ("event_details", EventDataDetails),
