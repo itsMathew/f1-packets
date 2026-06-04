@@ -117,9 +117,9 @@ class CarMotionData(Packet):
         ("world_right_dir_x", ctypes.c_int16),
         ("world_right_dir_y", ctypes.c_int16),
         ("world_right_dir_z", ctypes.c_int16),
-        ("g_force_lateral", ctypes.c_float),
-        ("g_force_longitudinal", ctypes.c_float),
-        ("g_force_vertical", ctypes.c_float),
+        ("g_force_lateral", ctypes.c_int16),
+        ("g_force_longitudinal", ctypes.c_int16),
+        ("g_force_vertical", ctypes.c_int16),
         ("yaw", ctypes.c_float),
         ("pitch", ctypes.c_float),
         ("roll", ctypes.c_float),
@@ -129,7 +129,7 @@ class CarMotionData(Packet):
 class PacketMotionData(Packet):
     _fields_ = [
         ("header", PacketHeader),
-        ("car_motion_data", CarMotionData * 22),
+        ("car_motion_data", CarMotionData * 24),
     ]
 
 
@@ -137,6 +137,20 @@ class MarshalZone(Packet):
     _fields_ = [
         ("zone_start", ctypes.c_float),
         ("zone_flag", ctypes.c_int8),
+    ]
+
+
+class ActiveAeroZone(Packet):
+    _fields_ = [
+        ("zone_start", ctypes.c_float),
+        ("zone_end", ctypes.c_float),
+    ]
+
+
+class DRSZone(Packet):
+    _fields_ = [
+        ("zone_start", ctypes.c_float),
+        ("zone_end", ctypes.c_float),
     ]
 
 
@@ -233,6 +247,19 @@ class PacketSessionData(Packet):
         ("weekend_structure", ctypes.c_uint8 * 12),
         ("sector2_lap_distance_start", ctypes.c_float),
         ("sector3_lap_distance_start", ctypes.c_float),
+        ("active_aero_track_status", ctypes.c_uint8),
+        ("num_active_aero_zones_full", ctypes.c_uint8),
+        ("active_aero_zones_full", ActiveAeroZone * 8),
+        ("num_active_aero_zones_partial", ctypes.c_uint8),
+        ("active_aero_zones_partial", ActiveAeroZone * 8),
+        ("num_drs_zones", ctypes.c_uint8),
+        ("drs_zones", DRSZone * 4),
+        ("start_reaction_time", ctypes.c_float),
+        ("anti_lock_brakes_assist", ctypes.c_uint8),
+        ("traction_control_assist", ctypes.c_uint8),
+        ("dynamic_racing_line_hi_vis", ctypes.c_uint8),
+        ("dynamic_racing_line_colour_blind", ctypes.c_uint8),
+        ("recurring_rewind_prompt", ctypes.c_uint8),
     ]
 
 
@@ -277,7 +304,7 @@ class LapData(Packet):
 class PacketLapData(Packet):
     _fields_ = [
         ("header", PacketHeader),
-        ("lap_data", LapData * 22),
+        ("lap_data", LapData * 24),
         ("time_trial_pb_car_idx", ctypes.c_uint8),
         ("time_trial_rival_car_idx", ctypes.c_uint8),
     ]
@@ -388,6 +415,7 @@ class Collision(Packet):
     _fields_ = [
         ("vehicle1_idx", ctypes.c_uint8),
         ("vehicle2_idx", ctypes.c_uint8),
+        ("severity", ctypes.c_uint8),
     ]
 
 
@@ -430,9 +458,9 @@ class LiveryColour(Packet):
 class ParticipantData(Packet):
     _fields_ = [
         ("ai_controlled", ctypes.c_uint8),
-        ("driver_id", ctypes.c_uint8),
-        ("network_id", ctypes.c_uint8),
-        ("team_id", ctypes.c_uint8),
+        ("driver_id", ctypes.c_uint16),
+        ("network_id", ctypes.c_uint16),
+        ("team_id", ctypes.c_uint16),
         ("my_team", ctypes.c_uint8),
         ("race_number", ctypes.c_uint8),
         ("nationality", ctypes.c_uint8),
@@ -450,7 +478,7 @@ class PacketParticipantsData(Packet):
     _fields_ = [
         ("header", PacketHeader),
         ("num_active_cars", ctypes.c_uint8),
-        ("participants", ParticipantData * 22),
+        ("participants", ParticipantData * 24),
     ]
 
 
@@ -485,7 +513,7 @@ class CarSetupData(Packet):
 class PacketCarSetupData(Packet):
     _fields_ = [
         ("header", PacketHeader),
-        ("car_setup_data", CarSetupData * 22),
+        ("car_setup_data", CarSetupData * 24),
         ("next_front_wing_value", ctypes.c_float),
     ]
 
@@ -505,7 +533,7 @@ class CarTelemetryData(Packet):
         ("brakes_temperature", ctypes.c_uint16 * 4),
         ("tyres_surface_temperature", ctypes.c_uint8 * 4),
         ("tyres_inner_temperature", ctypes.c_uint8 * 4),
-        ("engine_temperature", ctypes.c_uint16),
+        ("engine_temperature", ctypes.c_uint8),
         ("tyres_pressure", ctypes.c_float * 4),
         ("surface_type", ctypes.c_uint8 * 4),
     ]
@@ -514,7 +542,7 @@ class CarTelemetryData(Packet):
 class PacketCarTelemetryData(Packet):
     _fields_ = [
         ("header", PacketHeader),
-        ("car_telemetry_data", CarTelemetryData * 22),
+        ("car_telemetry_data", CarTelemetryData * 24),
         ("mfd_panel_index", ctypes.c_uint8),
         ("mfd_panel_index_secondary_player", ctypes.c_uint8),
         ("suggested_gear", ctypes.c_int8),
@@ -546,6 +574,7 @@ class CarStatusData(Packet):
         ("ers_deploy_mode", ctypes.c_uint8),
         ("ers_harvested_this_lap_mguk", ctypes.c_float),
         ("ers_harvested_this_lap_mguh", ctypes.c_float),
+        ("ers_harvest_limit_per_lap", ctypes.c_float),
         ("ers_deployed_this_lap", ctypes.c_float),
         ("network_paused", ctypes.c_uint8),
     ]
@@ -554,7 +583,7 @@ class CarStatusData(Packet):
 class PacketCarStatusData(Packet):
     _fields_ = [
         ("header", PacketHeader),
-        ("car_status_data", CarStatusData * 22),
+        ("car_status_data", CarStatusData * 24),
     ]
 
 
@@ -582,14 +611,14 @@ class PacketFinalClassificationData(Packet):
     _fields_ = [
         ("header", PacketHeader),
         ("num_cars", ctypes.c_uint8),
-        ("classification_data", FinalClassificationData * 22),
+        ("classification_data", FinalClassificationData * 24),
     ]
 
 
 class LobbyInfoData(Packet):
     _fields_ = [
         ("ai_controlled", ctypes.c_uint8),
-        ("team_id", ctypes.c_uint8),
+        ("team_id", ctypes.c_uint16),
         ("nationality", ctypes.c_uint8),
         ("platform", ctypes.c_uint8),
         ("name", ctypes.c_char * 32),
@@ -605,7 +634,7 @@ class PacketLobbyInfoData(Packet):
     _fields_ = [
         ("header", PacketHeader),
         ("num_players", ctypes.c_uint8),
-        ("lobby_players", LobbyInfoData * 22),
+        ("lobby_players", LobbyInfoData * 24),
     ]
 
 
@@ -639,7 +668,7 @@ class CarDamageData(Packet):
 class PacketCarDamageData(Packet):
     _fields_ = [
         ("header", PacketHeader),
-        ("car_damage_data", CarDamageData * 22),
+        ("car_damage_data", CarDamageData * 24),
     ]
 
 
@@ -739,7 +768,7 @@ class PacketMotionExData(Packet):
 class TimeTrialDataSet(Packet):
     _fields_ = [
         ("car_idx", ctypes.c_uint8),
-        ("team_id", ctypes.c_uint8),
+        ("team_id", ctypes.c_uint16),
         ("lap_time_in_ms", ctypes.c_uint),
         ("sector1_time_in_ms", ctypes.c_uint),
         ("sector2_time_in_ms", ctypes.c_uint),
@@ -767,27 +796,48 @@ class PacketLapPositionsData(Packet):
         ("header", PacketHeader),
         ("num_laps", ctypes.c_uint8),
         ("lap_start", ctypes.c_uint8),
-        ("position_for_vehicle_idx", ctypes.c_uint8 * 1100),
+        ("position_for_vehicle_idx", ctypes.c_uint8 * 1200),
+    ]
+
+
+class CarTelemetry2Data(Packet):
+    _fields_ = [
+        ("active_aero_mode", ctypes.c_uint8),
+        ("active_aero_available", ctypes.c_uint8),
+        ("active_aero_activation_distance", ctypes.c_uint16),
+        ("overtake_available", ctypes.c_uint8),
+        ("overtake_active", ctypes.c_uint8),
+        ("overtake_activation_distance", ctypes.c_uint16),
+        ("2026_regulations", ctypes.c_uint8),
+        ("driving_wrong_way", ctypes.c_uint8),
+    ]
+
+
+class PacketCarTelemetry2Data(Packet):
+    _fields_ = [
+        ("header", PacketHeader),
+        ("car_telemetry2_data", CarTelemetry2Data * 24),
     ]
 
 
 HEADER_FIELD_TO_PACKET_TYPE = {
-    (2025, 1, 0): PacketMotionData,
-    (2025, 1, 1): PacketSessionData,
-    (2025, 1, 2): PacketLapData,
-    (2025, 1, 3): PacketEventData,
-    (2025, 1, 4): PacketParticipantsData,
-    (2025, 1, 5): PacketCarSetupData,
-    (2025, 1, 6): PacketCarTelemetryData,
-    (2025, 1, 7): PacketCarStatusData,
-    (2025, 1, 8): PacketFinalClassificationData,
-    (2025, 1, 9): PacketLobbyInfoData,
-    (2025, 1, 10): PacketCarDamageData,
-    (2025, 1, 11): PacketSessionHistoryData,
-    (2025, 1, 12): PacketTyreSetsData,
-    (2025, 1, 13): PacketMotionExData,
-    (2025, 1, 14): PacketTimeTrialData,
-    (2025, 1, 15): PacketLapPositionsData,
+    (2026, 1, 0): PacketMotionData,
+    (2026, 1, 1): PacketSessionData,
+    (2026, 1, 2): PacketLapData,
+    (2026, 1, 3): PacketEventData,
+    (2026, 1, 4): PacketParticipantsData,
+    (2026, 1, 5): PacketCarSetupData,
+    (2026, 1, 6): PacketCarTelemetryData,
+    (2026, 1, 7): PacketCarStatusData,
+    (2026, 1, 8): PacketFinalClassificationData,
+    (2026, 1, 9): PacketLobbyInfoData,
+    (2026, 1, 10): PacketCarDamageData,
+    (2026, 1, 11): PacketSessionHistoryData,
+    (2026, 1, 12): PacketTyreSetsData,
+    (2026, 1, 13): PacketMotionExData,
+    (2026, 1, 14): PacketTimeTrialData,
+    (2026, 1, 15): PacketLapPositionsData,
+    (2026, 1, 16): PacketCarTelemetry2Data,
 }
 # [[[end]]]
 
