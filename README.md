@@ -12,7 +12,7 @@ that `cog` is installed (`pipx install cogapp`) before continuing.
 - Run `cog -Pr .\f1\packets.py` from the root folder.
 
 ## Docs
-This package follow this [documentation](https://forums.ea.com/t5/s/tghpe58374/attachments/tghpe58374/f1-games-game-info-hub-en/61/4/Data%20Output%20from%20F1%2025%20v3.pdf), but changes camel case to snake case.
+F1 25: This package follow this [F1 25 documentation](https://forums.ea.com/t5/s/tghpe58374/attachments/tghpe58374/f1-games-game-info-hub-en/61/4/Data%20Output%20from%20F1%2025%20v3.pdf), but changes camel case to snake case.
 
 ## Credits
 
